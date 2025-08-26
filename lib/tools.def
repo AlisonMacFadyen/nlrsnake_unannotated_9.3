@@ -1,0 +1,54 @@
+# Example Singularity definition file for installing mamba
+# and building a conda environment with bwa and fastqc
+
+BootStrap: docker
+From: almalinux:latest
+IncludeCmd: yes
+ 
+%environment
+    export PATH=/opt/software/mamba/bin:$PATH
+    export PATH=/opt/software/tools_env/bin:$PATH
+
+%post
+    yum -y update
+    yum -y install wget git vi
+    yum -y install gzip cmake gcc gcc-c++ make zlib-devel bzip2-devel
+    yum -y install epel-release
+    yum -y groupinstall "Development Tools"
+    yum -y install hdf5-devel
+    
+    mkdir -p /opt/software
+    cd /opt/software
+    
+    # Install mamba
+    wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+    bash Miniforge3-Linux-x86_64.sh -b -p /opt/software/mamba
+    rm -rf Miniforge3-Linux-x86_64.sh
+    export PATH=/opt/software/mamba/bin:$PATH
+    
+    # Create the .condarc file in the root directory
+    cat > /root/.condarc << 'EOF'
+channels:
+  - bioconda
+  - conda-forge
+  - pytorch
+  - nvidia
+channel_alias: https://repo.prefix.dev
+EOF
+    
+    # Also create it in /etc/conda for system-wide configuration
+    mkdir -p /etc/conda
+    cat > /etc/conda/.condarc << 'EOF'
+channels:
+  - bioconda
+  - conda-forge
+  - pytorch
+  - nvidia
+channel_alias: https://repo.prefix.dev
+EOF
+
+    # Test the configuration
+    /opt/software/mamba/bin/mamba info
+
+    # Create environment with bwa and fastqc
+    /opt/software/mamba/bin/mamba create -qy -p /opt/software/tools_env -c bioconda bwa fastqc

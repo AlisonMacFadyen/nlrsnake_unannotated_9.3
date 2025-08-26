@@ -1,0 +1,18 @@
+executor: slurm
+jobs: 100
+use-singularity: true  #
+printshellcmds: true
+keep-going: true
+rerun-incomplete: true
+latency-wait: 60
+
+# Default resources for all rules
+default-resources:
+  slurm_partition: "tsl-short"
+  mem_mb: 16000
+  runtime: 30
+  slurm_account: "tsl"  # This must be "tsl" for SLURM
+
+# Default threads if not specified in rule
+set-threads:
+  __default__: 4  # Most of the rules use 1-4 threads, can set a default

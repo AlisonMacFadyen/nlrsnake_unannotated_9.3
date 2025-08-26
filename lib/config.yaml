@@ -1,0 +1,3 @@
+scratch: "/tsl/scratch/macleand/nlrsnake/"
+sample_fasta_file: "/hpc-home/macleand/samples_to_fasta.csv"
+seqs_per_file: 6000
